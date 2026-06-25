@@ -47,7 +47,7 @@ export function Options() {
             { key: "word", label: "单词(.txt)", checked: options.target.includes("word") },
             { key: "list", label: "单词和章节(.txt)", checked: options.target.includes("list") },
             { key: "translation", label: "单词和翻译(.csv)", checked: options.target.includes("translation") },
-            { key: "anki", label: "Anki 分章节牌组(.txt)", checked: options.target.includes("anki") },
+            { key: "anki", label: "Anki 分章节牌组(.apkg)", checked: options.target.includes("anki") },
           ]}
           className="accent-primary-600"
           onChange={(e) => {

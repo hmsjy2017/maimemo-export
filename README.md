@@ -61,7 +61,7 @@ pnpm i
    pnpm cli --range selected --ids 1001,1002 --target word,translation --override
    ```
 
-导出结果会写入 `exported/<folder>/word`、`exported/<folder>/list`、`exported/<folder>/translation`。
+导出结果会写入 `exported/<folder>/word`、`exported/<folder>/list`、`exported/<folder>/translation`、`exported/<folder>/anki`。
 
 ### 启动 WebUI
 
