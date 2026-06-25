@@ -1,8 +1,16 @@
 import { stringify } from "csv-stringify/sync"
 import type { Target, Word } from "@/types"
 
-function toAnkiDeckName(value: string) {
-  return value.replace(/[\\\t\r\n]/g, " ").replace(/::/g, "：：").trim()
+function normalizeDeckName(value: string) {
+  return value.replace(/[\\\t\r\n]/g, " ").trim() || "墨墨词库"
+}
+
+function toAnkiDeckName(...values: string[]) {
+  return values
+    .flatMap(value => normalizeDeckName(value).split("::"))
+    .map(part => normalizeDeckName(part))
+    .filter(Boolean)
+    .join("::")
 }
 
 export function transform(words: Word[], traget: Target, deckName?: string): string {
@@ -34,8 +42,8 @@ export function transform(words: Word[], traget: Target, deckName?: string): str
       "#html:false",
       "#columns:Front Back Deck",
       ...words.map((k) => {
-        const chapter = k.list ? `::${toAnkiDeckName(k.list)}` : ""
-        return stringify([[k.word, k.translation ?? "", `${toAnkiDeckName(deckName ?? "墨墨词库")}${chapter}`]], { delimiter: "\t", record_delimiter: "" })
+        const deck = k.list ? toAnkiDeckName(deckName ?? "墨墨词库", k.list) : toAnkiDeckName(deckName ?? "墨墨词库")
+        return stringify([[k.word, k.translation ?? "", deck]], { delimiter: "\t", record_delimiter: "" })
       }),
     ].join("\n")
   }
