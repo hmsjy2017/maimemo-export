@@ -4,6 +4,7 @@ import { getLibWords, getLibs, translateAll } from "./query"
 import { checkDatabases, databases } from "./db"
 import { transform } from "./transform"
 import { ensureTargetFolders } from "./dir"
+import { targets } from "@/types"
 import type { ExportFnProps, ExportLog, Target, TrafficLights } from "@/types"
 
 export async function exportLib({ selected, range, type, options, fnEvery }: ExportFnProps & { fnEvery: (log: ExportLog) => Promise<boolean> }) {
@@ -18,11 +19,7 @@ export async function exportLib({ selected, range, type, options, fnEvery }: Exp
     }))
   }
 
-  const initStatus = {
-    word: "🟡",
-    list: "🟡",
-    translation: "🟡",
-  } as Record<Target, TrafficLights>
+  const initStatus = Object.fromEntries(targets.map(target => [target, "🟡"])) as Record<Target, TrafficLights>
   const score = {
     failed: 0,
     completed: 0,
@@ -40,6 +37,8 @@ export async function exportLib({ selected, range, type, options, fnEvery }: Exp
         let path = join(targetFolders[target], `${lib.name}.txt`)
         if (target === "translation")
           path = join(targetFolders[target], `${lib.name}.csv`)
+        else if (target === "anki")
+          path = join(targetFolders[target], `${lib.name}.txt`)
         if (!options.override && fs.existsSync(path)) {
           score.status[target] = "🟡"
           continue
@@ -47,9 +46,9 @@ export async function exportLib({ selected, range, type, options, fnEvery }: Exp
         if (!words.length) throw new Error("No words found")
 
         let content = ""
-        if (target === "translation") {
+        if (target === "translation" || target === "anki") {
           if (databases.ecdict?.db) {
-            content = transform(translateAll(words), target)
+            content = transform(translateAll(words), target, lib.name)
           } else {
             throw new Error("No ecdict database found")
           }
@@ -63,7 +62,7 @@ export async function exportLib({ selected, range, type, options, fnEvery }: Exp
         score.status[target] = "🔴"
       }
     }
-    const status = [score.status.word, score.status.list, score.status.translation] as ExportLog["status"]
+    const status = targets.map(target => score.status[target])
     score.completed++
     if (status.includes("🔴")) score.failed++
 

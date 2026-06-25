@@ -46,8 +46,8 @@ export interface ExportLog {
   all: number
   completed: number
   failed: number
-  status: [TrafficLights, TrafficLights, TrafficLights]
-  // 可以通过三个圆点 word list translation 🚥
+  status: TrafficLights[]
+  // 可以通过多个圆点 word list translation anki 🚥
   // 🟢 🟡 🔴 绿=成功 黄=跳过或者没导出 红=失败
   name: string
   time: string
@@ -60,7 +60,7 @@ export interface SelectedLib {
 
 export type LibType = "base" | "cloud"
 
-export const targets = ["word", "list", "translation"] as const
+export const targets = ["word", "list", "translation", "anki"] as const
 
 export type Target = (typeof targets)[number]
 

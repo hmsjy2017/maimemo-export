@@ -41,11 +41,11 @@ export function previewLibWords({
   target = "word",
 }: Props) {
   const words = getLibWords({ id, type, exculedMemorized })
-  if (target === "translation") {
+  if (target === "translation" || target === "anki") {
     if (!databases.maimemo_base?.db)
       return ""
     else
-      return transform(translateAll(words), target)
+      return transform(translateAll(words), target, getLibs(type).find(lib => lib.id === id)?.name)
   } else {
     return transform(words, target)
   }

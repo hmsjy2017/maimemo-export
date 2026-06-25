@@ -34,8 +34,8 @@ function usage() {
   --type <base|cloud>        词库类型，默认 base
   --range <all|selected>     导出范围，默认 all
   --ids <1,2,3>              选中词库 ID，使用 selected 时必需
-  --target <word,list,translation>
-                             导出目标，可逗号分隔，默认 word
+  --target <word,list,translation,anki>
+                             导出目标，可逗号分隔，默认 word；anki 为分章节牌组并包含中文释义
   --folder <name>            exported 下的输出目录名，默认 cli
   --exclude-memorized        排除已背单词
   --override                 覆盖已存在文件
@@ -45,6 +45,7 @@ function usage() {
   pnpm cli --list
   pnpm cli --target word,list --folder windows-export --override
   pnpm cli --range selected --ids 1001,1002 --target translation --override
+  pnpm cli --target anki --folder anki-export --override
 `
 }
 
@@ -125,8 +126,8 @@ function assertDatabaseReady(options: CliOptions) {
     throw new Error(`找不到可用的 maimemo_base.db: ${status.maimemo_base?.path}`)
   if (options.type === "cloud" && !status.maimemo_cloud?.status)
     throw new Error(`导出云词库需要 maimemo_cloud.db: ${status.maimemo_cloud?.path}`)
-  if (options.target.includes("translation") && !status.ecdict?.status)
-    throw new Error(`导出翻译需要 ecdict_ultimate.db: ${status.ecdict?.path}`)
+  if ((options.target.includes("translation") || options.target.includes("anki")) && !status.ecdict?.status)
+    throw new Error(`导出中文释义需要 ecdict_ultimate.db: ${status.ecdict?.path}`)
 }
 
 async function main() {

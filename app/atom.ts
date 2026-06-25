@@ -35,7 +35,7 @@ export const previewLibAtom = atom<PreviewLib>({
 })
 
 export const exporterOptionsAtom = atomWithLocalStorage<ExportOptions>("options", {
-  target: ["word", "list", "translation"],
+  target: ["word", "list", "translation", "anki"],
   exculedMemorized: false,
   folderName: "",
   override: false,
