@@ -1,8 +1,10 @@
+import type { Buffer } from "node:buffer"
 import { join } from "node:path"
 import fs from "fs-extra"
 import { getLibWords, getLibs, translateAll } from "./query"
 import { checkDatabases, databases } from "./db"
 import { transform } from "./transform"
+import { createAnkiApkg } from "./anki"
 import { ensureTargetFolders } from "./dir"
 import { targets } from "@/types"
 import type { ExportFnProps, ExportLog, Target, TrafficLights } from "@/types"
@@ -38,20 +40,24 @@ export async function exportLib({ selected, range, type, options, fnEvery }: Exp
         if (target === "translation")
           path = join(targetFolders[target], `${lib.name}.csv`)
         else if (target === "anki")
-          path = join(targetFolders[target], `${lib.name}.txt`)
+          path = join(targetFolders[target], `${lib.name}.apkg`)
         if (!options.override && fs.existsSync(path)) {
           score.status[target] = "🟡"
           continue
         }
         if (!words.length) throw new Error("No words found")
 
-        let content = ""
-        if (target === "translation" || target === "anki") {
-          if (databases.ecdict?.db) {
-            content = transform(translateAll(words), target, lib.name)
-          } else {
+        let content: string | Buffer = ""
+        if (target === "anki") {
+          if (databases.ecdict?.db)
+            content = await createAnkiApkg(translateAll(words), lib.name)
+          else
             throw new Error("No ecdict database found")
-          }
+        } else if (target === "translation") {
+          if (databases.ecdict?.db)
+            content = transform(translateAll(words), target, lib.name)
+          else
+            throw new Error("No ecdict database found")
         } else {
           content = transform(words, target)
         }
