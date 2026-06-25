@@ -35,7 +35,7 @@ function usage() {
   --range <all|selected>     导出范围，默认 all
   --ids <1,2,3>              选中词库 ID，使用 selected 时必需
   --target <word,list,translation,anki>
-                             导出目标，可逗号分隔，默认 word；anki 为分章节牌组并包含中文释义
+                             导出目标，可逗号分隔，默认 word；anki 为 apkg 分章节牌组并包含中文释义
   --folder <name>            exported 下的输出目录名，默认 cli
   --exclude-memorized        排除已背单词
   --override                 覆盖已存在文件
