@@ -27,6 +27,7 @@ export function Preview() {
             { value: "word", label: "仅单词" },
             { value: "list", label: "单词和章节" },
             { value: "translation", label: "单词和翻译" },
+            { value: "anki", label: "Anki 牌组" },
           ] as {
             value: Target
             label: string

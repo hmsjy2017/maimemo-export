@@ -18,7 +18,7 @@ const appRouter = t.router({
     id: z.number(),
     type: z.optional(z.enum(["base", "cloud"])).default("base"),
     exculedMemorized: z.optional(z.boolean()).default(false),
-    target: z.optional(z.enum(["word", "list", "translation"])).default("word"),
+    target: z.optional(z.enum(["word", "list", "translation", "anki"])).default("word"),
   })).query(req => previewLibWords(req.input)),
 })
 

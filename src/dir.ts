@@ -21,6 +21,7 @@ export async function ensureTargetFolders(folder: string) {
     word: "",
     list: "",
     translation: "",
+    anki: "",
   }
   for (const target of targets) {
     folders[target] = join(exportedDir, folder, target)
