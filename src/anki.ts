@@ -55,7 +55,23 @@ export async function createAnkiApkg(words: Word[], deckName = "墨墨词库") {
     if (!deckIds.has(fullDeckName)) deckIds.set(fullDeckName, checksum(fullDeckName) + deckIds.size + 1)
     return { word, index, deckName: fullDeckName, deckId: deckIds.get(fullDeckName)! }
   })
-  const decks = Object.fromEntries([...deckIds].map(([name, id]) => [id, { id, mod: now, name, usn: 0, collapsed: false, browserCollapsed: false, desc: "", dyn: 0, extendNew: 10, extendRev: 50, conf: 1 }]))
+  const decks = Object.fromEntries([...deckIds].map(([name, id]) => [id, {
+    id,
+    mod: now,
+    name,
+    usn: 0,
+    lrnToday: [0, 0],
+    revToday: [0, 0],
+    newToday: [0, 0],
+    timeToday: [0, 0],
+    collapsed: false,
+    browserCollapsed: false,
+    desc: "",
+    dyn: 0,
+    extendNew: 10,
+    extendRev: 50,
+    conf: 1,
+  }]))
   const models = {
     [MODEL_ID]: {
       id: MODEL_ID,
