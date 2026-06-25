@@ -11,13 +11,26 @@ const MODEL_ID = 1700000000000
 const CSS = ".card { font-family: arial; font-size: 20px; text-align: center; color: black; background-color: white; }"
 
 function normalizeDeckName(value: string) {
-  return value.replace(/[\\\t\r\n]/g, " ").replace(/::/g, "：：").trim() || "墨墨词库"
+  return value.replace(/[\\\t\r\n]/g, " ").trim() || "墨墨词库"
+}
+
+function toDeckPath(...values: string[]) {
+  return values
+    .flatMap(value => normalizeDeckName(value).split("::"))
+    .map(part => normalizeDeckName(part))
+    .filter(Boolean)
 }
 
 function checksum(value: string) {
   let hash = 0
   for (const char of value) hash = (Math.imul(31, hash) + char.charCodeAt(0)) | 0
   return Math.abs(hash)
+}
+
+function deckId(name: string, deckIds: Map<string, number>) {
+  let id = checksum(name) + 1
+  while ([...deckIds.values()].includes(id)) id += 1
+  return id
 }
 
 function ankiTimestamp() {
@@ -46,13 +59,16 @@ export async function createAnkiApkg(words: Word[], deckName = "墨墨词库") {
   const mediaPath = join(dir, "media")
   const zipPath = join(dir, "deck.apkg")
   const now = ankiTimestamp()
-  const baseDeckName = normalizeDeckName(deckName)
-  const baseDeckId = checksum(baseDeckName) + 1
+  const baseDeckName = toDeckPath(deckName).join("::")
+  const baseDeckId = deckId(baseDeckName, new Map())
   const deckIds = new Map<string, number>([[baseDeckName, baseDeckId]])
   const notes = words.map((word, index) => {
-    const chapter = word.list ? normalizeDeckName(word.list) : ""
-    const fullDeckName = chapter ? `${baseDeckName}::${chapter}` : baseDeckName
-    if (!deckIds.has(fullDeckName)) deckIds.set(fullDeckName, checksum(fullDeckName) + deckIds.size + 1)
+    const deckPath = word.list ? toDeckPath(baseDeckName, word.list) : [baseDeckName]
+    const fullDeckName = deckPath.join("::")
+    for (const [parentIndex] of deckPath.entries()) {
+      const name = deckPath.slice(0, parentIndex + 1).join("::")
+      if (!deckIds.has(name)) deckIds.set(name, deckId(name, deckIds))
+    }
     return { word, index, deckName: fullDeckName, deckId: deckIds.get(fullDeckName)! }
   })
   const decks = Object.fromEntries([...deckIds].map(([name, id]) => [id, {
