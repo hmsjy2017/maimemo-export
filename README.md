@@ -32,6 +32,37 @@ pnpm i
 
 2. 如果需要单词中文翻译，请下载 [skywind3000/ECDICT-ultimate](https://github.com/skywind3000/ECDICT-ultimate/releases/download/1.0.0/ecdict-ultimate-sqlite.zip) 词典，解压得到 `ultimate.db`，重命名为 `ecdict_ultimate.db` ，放入 `database`。
 
+### 命令行导出（支持 Windows）
+
+如果已经拿到数据库文件，可以不启动 WebUI，直接使用命令行导出。Windows 用户建议在 PowerShell、Windows Terminal 或 VS Code 终端中运行以下命令。
+
+1. 将数据库文件放入项目的 `database` 目录：
+   - `maimemo_base.db`：必需，墨墨本地词库数据库
+   - `maimemo_cloud.db`：可选，导出云词库/生词本时需要
+   - `ecdict_ultimate.db`：可选，导出中文翻译 CSV 时需要
+
+2. 查看命令行帮助：
+   ```shell
+   pnpm cli --help
+   ```
+
+3. 列出可导出的本地词库：
+   ```shell
+   pnpm cli --list
+   ```
+
+4. 导出全部本地词库的单词文本和 List 格式：
+   ```shell
+   pnpm cli --target word,list --folder cli-export --override
+   ```
+
+5. 导出指定词库：
+   ```shell
+   pnpm cli --range selected --ids 1001,1002 --target word,translation --override
+   ```
+
+导出结果会写入 `exported/<folder>/word`、`exported/<folder>/list`、`exported/<folder>/translation`。
+
 ### 启动 WebUI
 
 ```shell

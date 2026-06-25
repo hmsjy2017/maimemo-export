@@ -10,7 +10,8 @@
     "test": "vitest",
     "lint": "eslint .",
     "genDoc": "tsx scripts/genDoc.ts",
-    "lint:fix": "eslint . --fix"
+    "lint:fix": "eslint . --fix",
+    "cli": "tsx scripts/cli.ts"
   },
   "dependencies": {
     "@tanstack/match-sorter-utils": "^8.19.4",
