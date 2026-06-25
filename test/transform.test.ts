@@ -35,6 +35,18 @@ describe("createAnkiApkg", () => {
       await writeFile(apkgPath, apkg)
       const { stdout } = await execFileAsync("zipinfo", ["-1", apkgPath])
       expect(stdout.split("\n").filter(Boolean).sort()).toEqual(["collection.anki2", "media"])
+
+      await execFileAsync("unzip", ["-q", apkgPath, "collection.anki2", "-d", dir])
+      const { stdout: decksJson } = await execFileAsync("sqlite3", [join(dir, "collection.anki2"), "select decks from col"])
+      const decks = JSON.parse(decksJson)
+      for (const deck of Object.values<Record<string, unknown>>(decks)) {
+        expect(deck).toMatchObject({
+          lrnToday: [0, 0],
+          revToday: [0, 0],
+          newToday: [0, 0],
+          timeToday: [0, 0],
+        })
+      }
     } finally {
       await rm(dir, { recursive: true, force: true })
     }
