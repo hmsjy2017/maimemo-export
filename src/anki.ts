@@ -55,7 +55,23 @@ export async function createAnkiApkg(words: Word[], deckName = "墨墨词库") {
     if (!deckIds.has(fullDeckName)) deckIds.set(fullDeckName, checksum(fullDeckName) + deckIds.size + 1)
     return { word, index, deckName: fullDeckName, deckId: deckIds.get(fullDeckName)! }
   })
-  const decks = Object.fromEntries([...deckIds].map(([name, id]) => [id, { id, mod: now, name, usn: 0, collapsed: false, browserCollapsed: false, desc: "", dyn: 0, extendNew: 10, extendRev: 50, conf: 1 }]))
+  const decks = Object.fromEntries([...deckIds].map(([name, id]) => [id, {
+    id,
+    mod: now,
+    name,
+    usn: 0,
+    lrnToday: [0, 0],
+    revToday: [0, 0],
+    newToday: [0, 0],
+    timeToday: [0, 0],
+    collapsed: false,
+    browserCollapsed: false,
+    desc: "",
+    dyn: 0,
+    extendNew: 10,
+    extendRev: 50,
+    conf: 1,
+  }]))
   const models = {
     [MODEL_ID]: {
       id: MODEL_ID,
@@ -83,6 +99,7 @@ export async function createAnkiApkg(words: Word[], deckName = "墨墨词库") {
     "CREATE TABLE notes (id integer primary key, guid text not null, mid integer not null, mod integer not null, usn integer not null, tags text not null, flds text not null, sfld text not null, csum integer not null, flags integer not null, data text not null);",
     "CREATE TABLE cards (id integer primary key, nid integer not null, did integer not null, ord integer not null, mod integer not null, usn integer not null, type integer not null, queue integer not null, due integer not null, ivl integer not null, factor integer not null, reps integer not null, lapses integer not null, left integer not null, odue integer not null, odid integer not null, flags integer not null, data text not null);",
     "CREATE TABLE revlog (id integer primary key, cid integer not null, usn integer not null, ease integer not null, ivl integer not null, lastIvl integer not null, factor integer not null, time integer not null, type integer not null);",
+    "CREATE TABLE graves (usn integer not null, oid integer not null, type integer not null);",
     `INSERT INTO col VALUES(1, ${now}, ${now * 1000}, ${now * 1000}, 11, 0, 0, 0, ${ankiJson({ nextPos: 1 })}, ${ankiJson(models)}, ${ankiJson(decks)}, ${ankiJson({ 1: { id: 1, name: "Default", replayq: true, lapse: {}, rev: {}, timer: 0, maxTaken: 60, usn: 0, new: {}, mod: now, autoplay: true } })}, ${ankiJson({})});`,
     ...notes.flatMap(({ word, index, deckId }) => {
       const nid = now * 1000 + index + 1
